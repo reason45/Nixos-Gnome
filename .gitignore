@@ -1,0 +1,5 @@
+# Nix build output symlink
+result
+*.bak
+*.backup
+ssh
