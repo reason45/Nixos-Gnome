@@ -17,7 +17,7 @@ let
   papers = "org.gnome.Papers.desktop"; # PDF viewer
   loupe = "org.gnome.Loupe.desktop"; # Image viewer
   editor = "org.gnome.TextEditor.desktop";
-  roller = "org.gnome.FileRoller.desktop"; # Archives
+  nautilus = "org.gnome.Nautilus.desktop"; # Archives
   showtime = "org.gnome.Showtime.desktop"; # Video player
   decibels = "org.gnome.Decibels.desktop"; # Audio player
   writer = "writer.desktop"; # LibreOffice Writer
@@ -46,15 +46,10 @@ in
       # File manager
       // assign nautilus [ "inode/directory" ]
 
-      # Archives
-      // assign roller [
+      # Archives: Nautilus
+      // assign nautilus [
         "application/zip"
-        "application/gzip"
-        "application/x-tar"
         "application/x-compressed-tar"
-        "application/x-xz"
-        "application/x-7z-compressed"
-        "application/vnd.rar"
       ]
 
       # Text and code

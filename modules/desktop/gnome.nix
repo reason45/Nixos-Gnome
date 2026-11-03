@@ -1,9 +1,15 @@
 # ── modules/desktop/gnome.nix ───────────────────────────────────────────────
 # GNOME session + GDM. User-level GNOME settings live in home/desktop/gnome/.
-{ pkgs, lib, ... }:
+{ pkgs, lib, user, ... }:
 {
   services.displayManager.gdm.enable = true; # graphical login screen (Wayland)
   services.desktopManager.gnome.enable = true; # the GNOME desktop itself
+  
+  # Enable autologin
+services.displayManager.autoLogin = {
+    enable = true;
+    user = "${user}";
+  };
 
   # Core apps we don't want. Showtime (video) and Decibels (audio) stay.
   environment.gnome.excludePackages = with pkgs; [
@@ -19,7 +25,6 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    file-roller # archive handler (not part of GNOME's core-app set)
     bibata-cursors # system-wide so both GDM and the user session can use it
   ];
 
