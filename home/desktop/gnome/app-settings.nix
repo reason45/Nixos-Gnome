@@ -72,24 +72,26 @@ in
       cursor-theme = cursor.name;
       cursor-size = g.mkUint32 cursor.size;
       show-battery-percentage = true; # "48%" next to the battery icon
-      enable-hot-corners = false; # no accidental Overview when the mouse hits the corner
+      enable-hot-corners = true; # no accidental Overview when the mouse hits the corner
     };
 
     "org/gnome/desktop/wm/preferences".titlebar-font = "Inter Bold 12";
 
     # Volume slider stops at 100% (no distorted over-amplification).
-    "org/gnome/desktop/sound".allow-volume-above-100-percent = false;
+    "org/gnome/desktop/sound".allow-volume-above-100-percent = true;
 
     # Wallpaper display behavior.
     # The actual image is selected by services.nix.
     "org/gnome/desktop/background".picture-options = "zoom";
 
     # ── Privacy / housekeeping (added during review) ────────────────────────
-    # Empty the Trash and temp files automatically after 30 days.
+    # Empty the Trash and temp files automatically after 5 days.
+    #  Disable Nautilus recent-file history
     "org/gnome/desktop/privacy" = {
+      remember-recent-files = false;
       remove-old-trash-files = true;
       remove-old-temp-files = true;
-      old-files-age = g.mkUint32 30;
+      old-files-age = g.mkUint32 5;
     };
 
     # ── GNOME Shell ─────────────────────────────────────────────────────────

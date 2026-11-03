@@ -17,7 +17,6 @@ let
   papers = "org.gnome.Papers.desktop"; # PDF viewer
   loupe = "org.gnome.Loupe.desktop"; # Image viewer
   editor = "org.gnome.TextEditor.desktop";
-  nautilus = "org.gnome.Nautilus.desktop"; # Archives
   showtime = "org.gnome.Showtime.desktop"; # Video player
   decibels = "org.gnome.Decibels.desktop"; # Audio player
   writer = "writer.desktop"; # LibreOffice Writer
