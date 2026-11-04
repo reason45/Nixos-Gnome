@@ -10,7 +10,6 @@
     # ── shell: terminal experience
     ./shell/bash.nix # aliases, history, fastfetch on first terminal
     ./shell/starship.nix # the Powerline prompt
-    ./shell/git.nix # git identity + defaults
     ./shell/fastfetch.nix # system-info banner
     ./shell/tools.nix # bat, fzf, ripgrep, fd, btop, direnv
 

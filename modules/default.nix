@@ -14,7 +14,6 @@
     ./core/users.nix # your login account
     ./core/home-manager.nix # plugs ../home in as the user's config
     ./core/networking.nix # NetworkManager (Wi-Fi etc.)
-    ./core/packages.nix # tiny list of system-wide packages
     ./core/services.nix # printing, nix-ld, journal size cap
 
     # ── hardware: tuned for Dell Latitude 5410 (i5-10210U, 8 GB RAM)
@@ -31,5 +30,7 @@
 
     # ── system-wide apps
     ./apps/firefox.nix # Firefox + privacy policies + forced extensions
+    ./apps/keepass.nix # Keepass + Keepass wayland fix + settings
+    ./apps/github.nix  # Moved github and settings to system level
   ];
 }

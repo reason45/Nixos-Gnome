@@ -2,10 +2,13 @@
 # Firefox, system-wide. Everything is applied through enterprise policies
 # (/etc/firefox/policies/policies.json), so it works for any profile and needs
 # no Home Manager profile management. Check about:policies after a rebuild.
-{ ... }:
+{ pkgs, ... }:
 {
   programs.firefox = {
     enable = true;
+
+    # Lets the KeePassXC-Browser extension talk to the KeePassXC app.
+    nativeMessagingHosts.packages = [ pkgs.keepassxc ];
 
     # ── Policies: enforced rules (users can't override "Locked" ones) ────────
     policies = {
@@ -14,7 +17,7 @@
       DisableFirefoxStudies = true;
       DisableRemoteImprovements = true;
 
-      OfferToSaveLogins = false; # Bitwarden handles passwords
+      OfferToSaveLogins = false; # KeePassXC handles passwords
       AutofillAddressEnabled = false;
       AutofillCreditCardEnabled = false;
 
@@ -61,12 +64,12 @@
       # Extensions installed automatically on first launch (the long ID is the
       # add-on's internal identifier; find yours at about:support -> Extensions).
       ExtensionSettings = {
-        # Bitwarden
-        "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+        # KeePassXC-Browser
+        "keepassxc-browser@keepassxc.org" = {
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/keepassxc-browser/latest.xpi";
           installation_mode = "force_installed";
         };
-        
+
         # uBlock Origin
         "uBlock0@raymondhill.net" = {
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";

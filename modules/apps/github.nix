@@ -1,10 +1,10 @@
-# ── home/shell/git.nix ──────────────────────────────────────────────────────
+# ── modules/apps/git.nix ──────────────────────────────────────────────────────
 # Git identity and sensible defaults.
 { ... }:
 {
   programs.git = {
     enable = true;
-    settings = {
+    config = {
       user = {
         name = "Sanjayawosti";
         # GitHub "noreply" address: commits are linked to your account
