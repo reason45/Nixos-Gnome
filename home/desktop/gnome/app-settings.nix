@@ -1,6 +1,7 @@
 # ── home/desktop/gnome/app-settings.nix ─────────────────────────────────────
 # GNOME application and desktop settings: theme, fonts, cursor, wallpapers,
-# dock, hidden apps, text editor, weather, Files bookmarks, housekeeping.
+# dock, hidden apps, text editor, weather, Files bookmarks, housekeeping,
+# and Night Theme Switcher (day/night themes + sunrise/sunset commands).
 #
 # `dconf.settings` = the same thing as toggling options in GNOME Settings, but
 # declarative. To discover a key: run `dconf watch /` and change the setting
@@ -38,6 +39,20 @@ let
       ))
     ]
   );
+
+  # ── Night Theme Switcher ──────────────────────────────────────────────────
+  # Base dconf path of the extension (key names: verify with
+  # `dconf dump /org/gnome/shell/extensions/nightthemeswitcher/`).
+  nts = "org/gnome/shell/extensions/nightthemeswitcher";
+
+  # Commands run by the extension at sunrise / sunset. Store paths are used
+  # because the extension's shell does not have your NixOS PATH.
+  onSunrise = pkgs.writeShellScript "on-sunrise" ''
+    ${pkgs.libnotify}/bin/notify-send "Sunrise" "Light mode"
+  '';
+  onSunset = pkgs.writeShellScript "on-sunset" ''
+    ${pkgs.libnotify}/bin/notify-send "Sunset" "Dark mode"
+  '';
 in
 {
   # ── Appearance packages ───────────────────────────────────────────────────
@@ -45,8 +60,8 @@ in
     orchis-theme # GTK + GNOME Shell theme (Light/Dark variants)
     tela-icon-theme # icon theme (Tela / Tela-dark)
   ];
-  # (The active theme names are set by services.nix, which swaps
-  #  Orchis-Dark/Light + Tela whenever dark/light mode changes.)
+  # (Day/night theme names are set below by Night Theme Switcher; the
+  #  extension itself is installed and enabled in extensions.nix.)
 
   # Cursor for apps that read environment variables (X11/Xwayland).
   home.sessionVariables = {
@@ -72,21 +87,21 @@ in
       cursor-theme = cursor.name;
       cursor-size = g.mkUint32 cursor.size;
       show-battery-percentage = true; # "48%" next to the battery icon
-      enable-hot-corners = true; # no accidental Overview when the mouse hits the corner
+      enable-hot-corners = true; # moving the mouse to the top-left corner opens the Overview
     };
 
     "org/gnome/desktop/wm/preferences".titlebar-font = "Inter Bold 12";
 
-    # Volume slider stops at 100% (no distorted over-amplification).
+    # Volume slider may go above 100% (amplified, can distort).
     "org/gnome/desktop/sound".allow-volume-above-100-percent = true;
 
     # Wallpaper display behavior.
-    # The actual image is selected by services.nix.
+    # The actual image is selected by the random-wallpaper timer in services.nix.
     "org/gnome/desktop/background".picture-options = "zoom";
 
     # ── Privacy / housekeeping (added during review) ────────────────────────
     # Empty the Trash and temp files automatically after 5 days.
-    #  Disable Nautilus recent-file history
+    # Disable Nautilus recent-file history.
     "org/gnome/desktop/privacy" = {
       remember-recent-files = false;
       remove-old-trash-files = true;
@@ -114,6 +129,39 @@ in
       transparency-mode = "FIXED"; # fixed opacity instead of adaptive
       background-opacity = 0.3; # 30% — the glassy dock in the screenshots
       show-trash = false; # no Trash icon in the dock
+    };
+
+    # ── Night Theme Switcher ────────────────────────────────────────────────
+    # Day = light mode (sunrise → sunset), night = dark mode.
+    # Background switching is intentionally left off so it doesn't fight the
+    # random-wallpaper timer in services.nix.
+    # Automatic schedule: the extension computes sunrise/sunset itself from
+    # this location (degrees: latitude, longitude). The sunrise/sunset values
+    # in dconf are calculated results, so they are not declared here.
+    "${nts}/time" = {
+      manual-schedule = false;
+      location = g.mkTuple [ 28.048561867461615 81.6167 ];
+    };
+
+    "${nts}/gtk-variants" = {
+      enabled = true;
+      day = "Orchis-Light";
+      night = "Orchis-Dark";
+    };
+    "${nts}/shell-variants" = {
+      enabled = true;
+      day = "Orchis-Light";
+      night = "Orchis-Dark";
+    };
+    "${nts}/icon-variants" = {
+      enabled = true;
+      day = "Tela";
+      night = "Tela-dark";
+    };
+    "${nts}/commands" = {
+      enabled = true;
+      sunrise = "${onSunrise}";
+      sunset = "${onSunset}";
     };
 
     # ── App Hider ───────────────────────────────────────────────────────────

@@ -16,6 +16,14 @@
       { package = dash-to-dock; } # the transparent dock at the bottom
       { package = app-hider; } # hide unwanted apps from the app grid / search
       { package = appindicator; } # tray icons for apps that still use them
+      { package = gsconnect; } #Gsconnect extension
+
+      # Switches GTK/shell/icon themes at sunrise/sunset and runs commands.
+      # Settings (day/night themes, commands) are in app-settings.nix.
+      {
+        package = night-theme-switcher;
+        id = "nightthemeswitcher@romainvigier.fr";
+      }
 
       # User Themes lets us theme GNOME Shell itself (Orchis). Its UUID is
       # given explicitly because it is not auto-detected from the package.

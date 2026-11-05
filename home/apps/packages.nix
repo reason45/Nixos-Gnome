@@ -9,5 +9,6 @@
 {
   home.packages = with pkgs; [
     libreoffice # Writer / Calc / Impress (hidden entries: see app-settings.nix)
+    localsend #Send files back and forth from mobile
   ];
 }

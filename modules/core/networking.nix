@@ -32,8 +32,15 @@
     };
   };
 
-  # The firewall is ON by default in NixOS (everything incoming is blocked).
-  # To open a port, e.g. for a dev server or KDE Connect:
-  #   networking.firewall.allowedTCPPorts = [ 3000 ];
+   # The firewall is ON by default in NixOS (everything incoming is blocked).
+  # Ports 1714-1764 are for GSConnect / KDE Connect.
+  networking.firewall = {
+    allowedTCPPortRanges = [
+      { from = 1714; to = 1764; }
+    ];
+    allowedUDPPortRanges = [
+      { from = 1714; to = 1764; }
+    ];
+  };
 }
 
