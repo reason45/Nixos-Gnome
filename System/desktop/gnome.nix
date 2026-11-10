@@ -1,0 +1,47 @@
+# ── System/desktop/gnome.nix ───────────────────────────────────────────────
+# GNOME session + GDM. User-level GNOME settings live in Home/desktop/gnome/.
+{ pkgs, lib, user, ... }:
+{
+  services.displayManager.gdm.enable = true; # graphical login screen (Wayland)
+  services.desktopManager.gnome.enable = true; # the GNOME desktop itself
+  
+  # Enable autologin
+services.displayManager.autoLogin = {
+    enable = true;
+    user = "${user}";
+  };
+
+  # Core apps we don't want. Showtime (video) and Decibels (audio) stay.
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour # first-login tour
+    gnome-user-docs # help manual
+    epiphany # GNOME Web — Firefox is the browser
+    gnome-contacts
+    gnome-logs
+    gnome-connections # remote desktop client
+    baobab # Disk Usage Analyzer
+    gnome-maps
+    yelp # help viewer
+  ];
+
+  # KDE Connect / GSConnect (phone integration) needs this port range open.
+  networking.firewall = {
+    allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
+    allowedUDPPortRanges = [ { from = 1714; to = 1764; } ];
+  };
+
+  environment.systemPackages = with pkgs; [
+    bibata-cursors # system-wide so both GDM and the user session can use it
+  ];
+
+  # Login-screen cursor: GDM can't see the user's settings.
+  # (Keep in sync with the cursor in Home/desktop/gnome/app-settings.nix.)
+  programs.dconf.profiles.gdm.databases = [
+    {
+      settings."org/gnome/desktop/interface" = {
+        cursor-theme = "Bibata-Modern-Ice";
+        cursor-size = lib.gvariant.mkUint32 24;
+      };
+    }
+  ];
+}
