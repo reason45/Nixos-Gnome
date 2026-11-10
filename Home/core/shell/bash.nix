@@ -47,8 +47,8 @@ in
     historySize = 2000;
     historyFileSize = 2000;
     historyIgnore = [
-      "ls" "ll" "cd" "cd *" "pwd" "clear" "exit" "reboot" "fastfetch"
-      "history" "history *" "git status" "git add *" "free *" "df *"
+      "ls" "ll" "cd" "cd *" "pwd" "clear" "exit" "reboot" "fastfetch" "rebuild *"
+      "history" "history *" "git *" "free *" "df *"
     ];
 
     # Show fastfetch every time an interactive shell starts (new terminal,

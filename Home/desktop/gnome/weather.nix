@@ -40,5 +40,11 @@ in
       automatic-location = false;
       locations = [ butwal ];
     };
+
+    # Show temperatures in °C instead of °F.
+    # Use "org/gnome/GWeather" instead on GNOME < 40.
+    "org/gnome/GWeather4" = {
+      temperature-unit = "centigrade";
+    };
   };
 }
