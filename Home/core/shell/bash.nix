@@ -34,7 +34,7 @@ in
       # ── NixOS: cleanup ────────────────────────────────────────────────────
       # NORMAL: remove system generations older than 7 days, refresh the boot
       # menu, then collect garbage.
-      clean = "sudo nix-env --profile /nix/var/nix/profiles/system --delete-generations 7d && sudo nixos-rebuild boot --flake ${flake} && sudo nix-collect-garbage";
+      clean = "sudo nix-collect-garbage";
 
       # ATOM BOMB: delete EVERY old system generation, rebuild the boot entry,
       # wipe the Nix eval cache, then collect garbage. No rollback afterwards.
