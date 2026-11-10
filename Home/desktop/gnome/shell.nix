@@ -22,7 +22,7 @@ in
     };
 
     "org/gnome/desktop/sound" = {
-      allow-volume-above-100-percent = true;
+      allow-volume-above-100-percent = false; #Value true when required
     };
 
     "org/gnome/desktop/privacy" = {
