@@ -5,7 +5,7 @@
 {
   # Printing (CUPS). With this on, GNOME Settings -> Printers can discover and
   # add printers, and apps get a working Print dialog.
-  services.printing.enable = true;
+ # services.printing.enable = true;
 
   # nix-ld: lets pre-built, NON-Nix Linux programs run (VS Code remote server,
   # pip/npm native wheels, downloaded CLI tools, AppImages, ...). Without it
