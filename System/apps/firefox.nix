@@ -1,124 +1,186 @@
 # ── System/apps/firefox.nix ────────────────────────────────────────────────
-# Firefox, system-wide via enterprise policies (/etc/firefox/policies/policies.json).
-# Works for any profile; independent of Home Manager. Check about:policies after rebuild.
+# Firefox, system-wide via NixOS and Mozilla enterprise policies.
+#
+# Personal desktop configuration:
+# - Privacy-conscious defaults without aggressive hardening.
+# - User-adjustable preferences (Status = "default").
+# - Strict Enhanced Tracking Protection by default.
+# - HTTPS-Only Mode enabled by default, but user can disable it.
+# - Clear browsing and form history on exit; preserve cookies and sessions.
+# - Bitwarden and uBlock Origin installed normally, not force-managed.
+#
+# After rebuilding, inspect about:policies and about:config.
 
 { ... }:
 {
   programs.firefox = {
     enable = true;
 
-    # ── Policies: enforced rules (users can't override "Locked" ones) ────────
+    # ── Enterprise policies ────────────────────────────────────────────────
+    # Avoid Locked = true so every setting stays user-adjustable.
     policies = {
-      # Privacy: no telemetry, no experiments pushed from Mozilla.
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      DisableRemoteImprovements = true;
 
-      # Bitwarden is the only password manager: turn Firefox's own off entirely.
-      PasswordManagerEnabled = false;
-      OfferToSaveLogins = false;
-      AutofillAddressEnabled = false;
-      AutofillCreditCardEnabled = false;
-
-      # Do not remember search and form entries.
-      DisableFormHistory = true;
-
-      # DuckDuckGo is the default search engine.
+      # ── Search engine ────────────────────────────────────────────────────
       SearchEngines = {
         Default = "DuckDuckGo";
       };
 
-      # These bookmarks are available as address-bar suggestions when typing.
-      # They are not shown as homepage shortcuts (TopSites is disabled below).
+      # ── Bookmarks ────────────────────────────────────────────────────────
       Bookmarks = [
-        { Title = "Proton Mail"; URL = "https://mail.proton.me"; Placement = "menu"; }
-        { Title = "ChatGPT"; URL = "https://chatgpt.com"; Placement = "menu"; }
-        { Title = "YouTube"; URL = "https://www.youtube.com"; Placement = "menu"; }
-        { Title = "Facebook"; URL = "https://www.facebook.com"; Placement = "menu"; }
-        { Title = "Reddit"; URL = "https://www.reddit.com"; Placement = "menu"; }
+        {
+          Title = "Proton Mail";
+          URL = "https://mail.proton.me";
+          Placement = "menu";
+        }
+        {
+          Title = "ChatGPT";
+          URL = "https://chatgpt.com";
+          Placement = "menu";
+        }
+        {
+          Title = "YouTube";
+          URL = "https://www.youtube.com";
+          Placement = "menu";
+        }
+        {
+          Title = "Facebook";
+          URL = "https://www.facebook.com";
+          Placement = "menu";
+        }
+        {
+          Title = "Reddit";
+          URL = "https://www.reddit.com";
+          Placement = "menu";
+        }
       ];
 
-      # Clean new-tab page: no shortcuts, no sponsored content.
+      # ── Firefox Home ─────────────────────────────────────────────────────
       FirefoxHome = {
-        Search = true; # Keep the search box on the new-tab homepage.
-        TopSites = false; # Do not show bookmarks/sites as homepage shortcuts.
+        Search = true;
+        TopSites = false;
         SponsoredTopSites = false;
         SponsoredStories = false;
-        Locked = true;
+        Stories = false;
+        Locked = false;
       };
 
-      # Turn off Firefox's built-in AI features.
-      # Remove "Translations" if you want built-in page translation back.
+      # ── HTTPS-Only Mode ──────────────────────────────────────────────────
+      HttpsOnlyMode = "enabled";
+
+      # ── Website permissions ──────────────────────────────────────────────
+      Permissions = {
+        Notifications = {
+          BlockNewRequests = true;
+          Locked = false;
+        };
+      };
+
+      # ── Firefox AI features ──────────────────────────────────────────────
+      # Verify these names in about:policies after rebuilding.
       AIControls = {
-        Default = { Value = "blocked"; Locked = true; };
-        Translations = { Value = "blocked"; Locked = true; };
-        PDFAltText = { Value = "blocked"; Locked = true; };
-        SmartTabGroups = { Value = "blocked"; Locked = true; };
-        LinkPreviewKeyPoints = { Value = "blocked"; Locked = true; };
-        SidebarChatbot = { Value = "blocked"; Locked = true; };
-        SmartWindow = { Value = "blocked"; Locked = true; };
-        SpeechRecognition = { Value = "blocked"; Locked = true; };
+        Default = {
+          Value = "blocked";
+          Locked = false;
+        };
+        Translations = {
+          Value = "blocked";
+          Locked = false;
+        };
+        PDFAltText = {
+          Value = "blocked";
+          Locked = false;
+        };
+        SmartTabGroups = {
+          Value = "blocked";
+          Locked = false;
+        };
+        LinkPreviewKeyPoints = {
+          Value = "blocked";
+          Locked = false;
+        };
+        SidebarChatbot = {
+          Value = "blocked";
+          Locked = false;
+        };
+        SmartWindow = {
+          Value = "blocked";
+          Locked = false;
+        };
+        SpeechRecognition = {
+          Value = "blocked";
+          Locked = false;
+        };
       };
 
-      # Extensions installed automatically on first launch (the long ID is the
-      # add-on's internal identifier; find yours at about:support -> Extensions).
+      # ── Extensions ───────────────────────────────────────────────────────
       ExtensionSettings = {
         # Bitwarden
         "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
-          installation_mode = "force_installed";
+          install_url =
+            "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+          installation_mode = "normal_installed";
         };
 
         # uBlock Origin
         "uBlock0@raymondhill.net" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-          installation_mode = "force_installed";
+          install_url =
+            "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+          installation_mode = "normal_installed";
         };
       };
     };
 
-    # ── about:config defaults ───────────────────────────────────────────────
-    # "default" = starting values you can still change;
-    # use "locked" to force them.
+    # ── about:config preferences ───────────────────────────────────────────
+    # Written as policy Preferences with Status = "default".
     preferencesStatus = "default";
-    preferences = {
-      "browser.toolbars.bookmarks.visibility" = "never"; # hide the bookmarks bar
 
-      # File dialogs go through xdg-desktop-portal (the desktop's own file picker).
+    preferences = {
+
+      # ── Privacy: Enhanced Tracking Protection ────────────────────────────
+      "browser.contentblocking.category" = "strict";
+
+      # ── Privacy: data submission ─────────────────────────────────────────
+      "datareporting.policy.dataSubmissionEnabled" = false;
+
+      # ── Password manager and autofill ────────────────────────────────────
+      "signon.rememberSignons" = false;
+      "extensions.formautofill.addresses.enabled" = false;
+      "extensions.formautofill.creditCards.enabled" = false;
+      "browser.formfill.enable" = true;
+
+      # ── Touchpad gestures ────────────────────────────────────────────────
+      # Empty values disable Firefox back/forward swipes, so GNOME's
+      # workspace swipe doesn't navigate history.
+      "browser.gesture.swipe.left" = "";
+      "browser.gesture.swipe.right" = "";
+
+      # ── File dialogs ─────────────────────────────────────────────────────
       "widget.use-xdg-desktop-portal.file-picker" = 1;
 
-      # Hardware video decode on the Intel GPU (see System/hardware/graphics.nix).
+      # ── Hardware video decoding ──────────────────────────────────────────
       "media.ffmpeg.vaapi.enabled" = true;
-      # Comet Lake has no AV1 hardware decode; with AV1 on, YouTube serves it and
-      # the CPU decodes it. Off = YouTube falls back to VP9/H.264 (GPU-decoded).
       "media.av1.enabled" = false;
 
-      # New tab / address bar noise
+      # ── New tab and address-bar appearance ───────────────────────────────
       "browser.discovery.enabled" = false;
       "extensions.htmlaboutaddons.recommendations.enabled" = false;
       "extensions.getAddons.showPane" = false;
+
       "browser.newtabpage.activity-stream.showSponsored" = false;
       "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
       "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
       "browser.newtabpage.activity-stream.feeds.topsites" = false;
       "browser.newtabpage.activity-stream.showSearch" = true;
 
-      # Address bar: keep bookmark matches only; disable all other suggestion
-      # categories requested (history, open tabs, shortcuts, recent searches,
-      # search engines and quick actions).
+      # ── Address bar suggestions ──────────────────────────────────────────
       "browser.urlbar.suggest.history" = false;
       "browser.urlbar.suggest.bookmark" = true;
       "browser.urlbar.suggest.openpage" = false;
       "browser.urlbar.suggest.recentsearches" = false;
       "browser.urlbar.suggest.searches" = false;
       "browser.urlbar.suggest.quickactions" = false;
-
-      # Do not show the search query in the address bar after loading results.
       "browser.urlbar.showSearchTerms.enabled" = false;
-
-      # Do not place search suggestions ahead of browsing-history results.
       "browser.urlbar.showSearchSuggestionsFirst" = false;
-
       "browser.urlbar.suggest.quicksuggest.sponsored" = false;
       "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
       "browser.urlbar.suggest.addons" = false;
@@ -127,15 +189,33 @@
       "browser.urlbar.suggest.trending" = false;
       "browser.urlbar.suggest.yelp" = false;
 
-      # Crash reporting (the telemetry, studies, password and autofill
-      # switches are already covered by the policies above)
+      # ── Crash reporting ──────────────────────────────────────────────────
       "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
       "browser.crashReports.unsubmittedCheck.enabled" = false;
       "browser.tabs.crashReporting.sendReport" = false;
 
-      # No accidental back/forward on touchpad swipe
-      "browser.gesture.swipe.left" = "";
-      "browser.gesture.swipe.right" = "";
+      # ── Interface preferences ────────────────────────────────────────────
+      "browser.toolbars.bookmarks.visibility" = "never";
     };
+
+    # ── autoConfig: preferences that the policy engine rejects ─────────────
+    # Written to defaults/pref, so they act as defaults the user can change.
+    autoConfig = ''
+      // Telemetry and studies
+      pref("toolkit.telemetry.enabled", false);
+      pref("datareporting.healthreport.uploadEnabled", false);
+      pref("app.shield.optoutstudies.enabled", false);
+
+      // Shutdown cleanup: clear history and form data, keep cookies and sessions
+      pref("privacy.sanitize.sanitizeOnShutdown", true);
+      pref("privacy.clearOnShutdown.history", true);
+      pref("privacy.clearOnShutdown.formdata", true);
+      pref("privacy.clearOnShutdown.cookies", false);
+      pref("privacy.clearOnShutdown.sessions", false);
+      pref("privacy.clearOnShutdown_v2.browsingHistoryAndDownloads", true);
+      pref("privacy.clearOnShutdown_v2.formdata", true);
+      pref("privacy.clearOnShutdown_v2.cookiesAndStorage", false);
+    '';
   };
 }
+
