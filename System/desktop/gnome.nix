@@ -11,7 +11,7 @@ services.displayManager.autoLogin = {
     user = "${user}";
   };
 
-  # Core apps we don't want. Showtime (video) and Decibels (audio) stay.
+  # Core apps we don't want.
   environment.gnome.excludePackages = with pkgs; [
     gnome-tour # first-login tour
     gnome-user-docs # help manual
@@ -22,13 +22,9 @@ services.displayManager.autoLogin = {
     baobab # Disk Usage Analyzer
     gnome-maps
     yelp # help viewer
+    decibels
+    gnome-music
   ];
-
-  # KDE Connect / GSConnect (phone integration) needs this port range open.
-  networking.firewall = {
-    allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
-    allowedUDPPortRanges = [ { from = 1714; to = 1764; } ];
-  };
 
   environment.systemPackages = with pkgs; [
     bibata-cursors # system-wide so both GDM and the user session can use it

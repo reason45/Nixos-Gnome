@@ -33,11 +33,17 @@ in
 
       show-battery-percentage = true;
       enable-hot-corners = true;
+      
 
       # Initial theme; Night Theme Switcher changes these at sunrise/sunset.
       gtk-theme = "Orchis-Light";
       icon-theme = "Tela";
       color-scheme = "prefer-light";
+    };
+    
+    "org/gnome/desktop/app-folders" = {
+    # Remove all application folders from the GNOME App Grid.
+    folder-children = [];
     };
 
     "org/gnome/desktop/wm/preferences" = {

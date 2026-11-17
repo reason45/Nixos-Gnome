@@ -17,5 +17,6 @@
     ./gnome/hidden-apps.nix # GNOME launcher entries to hide
     ./gnome/text-editor.nix # GNOME Text Editor
     ./gnome/weather.nix # Butwal location
+    ./gnome/gnome-console.nix #Console settings
   ];
 }

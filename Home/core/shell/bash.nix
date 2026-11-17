@@ -1,12 +1,11 @@
+
 # ── Home/core/shell/bash.nix ────────────────────────────────────────────────
-# Bash: aliases, history rules and the fastfetch banner in every new terminal.
-# (The pretty prompt itself comes from starship.nix.)
-#
-# `host` comes from flake.nix, so the aliases build the right machine even
-# before the hostname has changed.
+# Bash: aliases, history rules and Fastfetch banner.
+# The prompt itself is configured in starship.nix.
+
 { host, ... }:
+
 let
-  # Where the flake lives. Change this one line if you move it.
   flakeDir = "/etc/nixos";
   flake = "${flakeDir}#${host}";
 in
@@ -14,45 +13,118 @@ in
   programs.bash = {
     enable = true;
 
+    # ── Aliases ─────────────────────────────────────────────────────────────
     shellAliases = {
-      # ── everyday ──────────────────────────────────────────────────────────
+      # Everyday
       ls = "ls --color=auto";
-      ll = "ls -alFh --color=auto"; # long list, hidden files, human sizes
-      la = "ls -A --color=auto"; # all files except . and ..
+      ll = "ls -alFh --color=auto";
+      la = "ls -A --color=auto";
       grep = "grep --color=auto";
       ".." = "cd ..";
       "..." = "cd ../..";
 
-      # ── NixOS: rebuild ────────────────────────────────────────────────────
-      # System + Home Manager in one go. New files must be `git add`ed first
-      # (flakes ignore untracked files).
-      rebuild = "sudo nixos-rebuild switch --flake ${flake}"; # build + activate now
-      rebuild-boot = "sudo nixos-rebuild boot --flake ${flake}"; # activate on next reboot
-      rebuild-test = "sudo nixos-rebuild test --flake ${flake}"; # activate, but don't make it the boot default
-      rebuild-check = "nixos-rebuild build --flake ${flake}"; # build only, activate nothing
+      # NixOS: rebuild
+      rebuild       = "sudo nixos-rebuild switch --flake ${flake}";
+      rebuild-boot  = "sudo nixos-rebuild boot --flake ${flake}";
+      rebuild-test  = "sudo nixos-rebuild test --flake ${flake}";
+      rebuild-check = "nixos-rebuild build --flake ${flake}";
 
-      # ── NixOS: cleanup ────────────────────────────────────────────────────
-      # NORMAL: remove system generations older than 7 days, refresh the boot
-      # menu, then collect garbage.
-      clean = "sudo nix-collect-garbage";
+      # NixOS: cleanup
+      # Keep the latest 2 system generations, collect garbage, then rebuild the
+      # boot menu so it no longer lists generations that were just deleted
+      # (a stale entry would fail to boot).
+      clean = ''
+        sudo nix-env --profile /nix/var/nix/profiles/system \
+          --delete-generations +2 &&
+        sudo nix-collect-garbage &&
+        sudo /run/current-system/bin/switch-to-configuration boot
+      '';
 
-      # ATOM BOMB: delete EVERY old system generation, rebuild the boot entry,
-      # wipe the Nix eval cache, then collect garbage. No rollback afterwards.
-      clean-all = "sudo rm /nix/var/nix/profiles/system-* && sudo nixos-rebuild boot --flake ${flake} && sudo rm -rf ~/.cache/nix && sudo nix-collect-garbage -d";
+      # ATOM BOMB 1 (clean-reinstall helper, e.g. switching desktop branches):
+      # Delete system generation links, rebuild, wipe home and reboot.
+      # PRESERVED in $HOME: Desktop Documents Downloads Pictures Public
+      # Templates Music Projects Videos Filen .ssh and .config/mozilla.
+      # Everything else (keyring, other dotfiles) is deleted on purpose.
+      clean-all1 = ''
+        sudo rm -rf -- /nix/var/nix/profiles/system-* &&
+        sudo nixos-rebuild boot --flake ${flake} &&
+        find "$HOME" -mindepth 1 -maxdepth 1 \
+          ! -name Desktop \
+          ! -name Documents \
+          ! -name .ssh \
+          ! -name Downloads \
+          ! -name Pictures \
+          ! -name Public \
+          ! -name Templates \
+          ! -name Music \
+          ! -name Projects \
+          ! -name Videos \
+          ! -name Filen \
+          ! -name .config \
+          -exec rm -rf -- {} + &&
+        find "$HOME/.config" -mindepth 1 -maxdepth 1 \
+          ! -name mozilla \
+          -exec rm -rf -- {} + &&
+        sudo reboot
+      '';
+
+      # ATOM BOMB 2:
+      # Garbage collect, optimize the store and reset GNOME settings.
+      clean-all2 = ''
+        sudo nix-collect-garbage -d &&
+        sudo nix-store --optimise &&
+        dconf reset -f /org/gnome/
+      '';
     };
 
     # ── History ─────────────────────────────────────────────────────────────
-    # No repeats, and trivial commands are never saved.
-    historyControl = [ "ignoredups" "ignorespace" "erasedups" ]; # leading space = don't save
-    historySize = 2000;
-    historyFileSize = 2000;
-    historyIgnore = [
-      "ls" "ll" "cd" "cd *" "pwd" "clear" "exit" "reboot" "fastfetch" "rebuild *"
-      "history" "history *" "git *" "free *" "df *"
+    historyControl = [
+      "ignoredups"
+      "ignorespace"
+      "erasedups"
     ];
 
-    # Show fastfetch every time an interactive shell starts (new terminal,
-    # new tab, subshell). Scripts and other non-interactive shells skip it.
+    historySize = 2000;
+    historyFileSize = 2000;
+
+    # Ignore routine commands, aliases and selected Git operations.
+    historyIgnore = [
+      # Everyday commands
+      "ls"
+      "ll"
+      "la"
+      "grep"
+      "cd"
+      "cd *"
+      "pwd"
+      "clear"
+      "exit"
+      "reboot"
+      "fastfetch"
+
+      # Directory navigation aliases
+      ".."
+      "..."
+
+      # NixOS aliases
+      "rebuild"
+      "rebuild-*"
+      "clean"
+      "clean-*"
+
+      # Git: ignore only these operations.
+      "git add*"
+      "git push*"
+      "git commit*"
+
+      # Other routine commands
+      "history"
+      "history *"
+      "free *"
+      "df *"
+    ];
+
+    # ── Fastfetch ───────────────────────────────────────────────────────────
     initExtra = ''
       if [[ $- == *i* ]]; then
         fastfetch
@@ -60,6 +132,7 @@ in
     '';
   };
 
-  # Default terminal editor (nano ships with NixOS).
+  # ── Default editor ────────────────────────────────────────────────────────
   home.sessionVariables.EDITOR = "nano";
 }
+

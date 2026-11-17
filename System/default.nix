@@ -25,7 +25,7 @@
     ./hardware/intel.nix # CPU microcode, firmware, thermald
     ./hardware/memory.nix # zram + swapfile + earlyoom
     ./hardware/audio.nix # PipeWire sound
-    ./hardware/laptop.nix # battery, power profiles, Bluetooth, fwupd, TRIM
+    ./hardware/laptop.nix # battery, power profiles, Bluetooth, fwupd, TRIM, SMART
 
     # ── system-wide apps (kept here so they survive a Home Manager failure)
     ./apps/firefox.nix # Firefox + privacy policies + forced extensions
