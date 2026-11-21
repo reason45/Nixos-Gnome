@@ -8,6 +8,7 @@
 {
   home.packages = with pkgs; [
     libreoffice # Writer / Calc (the other entries are hidden: see hide-apps.nix)
+    android-tools
     filen-desktop
     zoom-us
     deluge
